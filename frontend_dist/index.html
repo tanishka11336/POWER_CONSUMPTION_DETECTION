@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetouan City Power Consumption // Deep Learning Forecasting System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Load Local Chart.js so it NEVER fails on external CDN -->
+  <script src="/static/js/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Sticky Header -->
+  <header class="header-container">
+    <div class="brand-section">
+      <div class="logo-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="title-wrap">
+        <h1>TETOUAN CITY POWER CONSUMPTION FORECASTING</h1>
+        <p>DEEP LEARNING NEURAL MODELS &bull; ZONE 1, 2 & 3 CONSUMPTION TELEMETRY</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="status-indicator">
+        <div class="pulse-dot"></div>
+        <span id="system-status-text">NEURAL INFERENCE ONLINE</span>
+      </div>
+
+      <div class="model-selector-wrap">
+        <label for="model-select">Forecasting Model:</label>
+        <select id="model-select" class="model-select">
+          <option value="Residual-MLP" selected>Residual-MLP (99.6% Accuracy)</option>
+          <option value="LSTM">LSTM Recurrent (98.7% Accuracy)</option>
+          <option value="GRU">GRU Gated (98.4% Accuracy)</option>
+          <option value="Transformer">Transformer Attention (98.2% Accuracy)</option>
+          <option value="CNN-BiLSTM">CNN-BiLSTM Hybrid (97.5% Accuracy)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs-container">
+    <button class="tab-btn active" data-tab="monitor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+      Power Consumption Monitor
+    </button>
+    <button class="tab-btn" data-tab="calculator">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>
+      Deep Learning Power Predictor
+    </button>
+    <button class="tab-btn" data-tab="dataset">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+      Dataset Records (52,416 Rows)
+    </button>
+    <button class="tab-btn" data-tab="forecast">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Multi-Horizon Forecast (1h-48h)
+    </button>
+    <button class="tab-btn" data-tab="benchmarks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      Model Benchmark Hub
+    </button>
+    <button class="tab-btn" data-tab="topology">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Zone Consumption Analytics
+    </button>
+    <button class="tab-btn" data-tab="report">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      Production Technical Report
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- Primary Power Consumption KPI Banner -->
+    <div class="kpi-grid">
+      <!-- Total Power Card -->
+      <div class="kpi-card" style="--card-accent: #06b6d4;">
+        <div class="kpi-header">
+          <span class="kpi-title">TOTAL POWER CONSUMPTION</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" style="width:18px;height:18px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+        </div>
+        <div class="kpi-value-wrap">
+          <span class="kpi-value" id="kpi-total-val">71,223</span>
+          <span class="kpi-unit">KW</span>
+        </div>
+        <div class="kpi-subtext">
+          <span class="badge-tag badge-green" id="grid-alert-status">NORMAL LOAD</span>
+          <span>Peak: <strong>134,208 KW</strong></span>
+        </div>
+      </div>
+
+      <!-- Zone 1 Power Card -->
+      <div class="kpi-card" style="--card-accent: #3b82f6;">
+        <div class="kpi-header">
+          <span class="kpi-title">ZONE 1 POWER CONSUMPTION</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="width:18px;height:18px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          </div>
+        </div>
+        <div class="kpi-value-wrap">
+          <span class="kpi-value" id="kpi-zone1-val">32,345</span>
+          <span class="kpi-unit">KW</span>
+        </div>
+        <div class="kpi-subtext">
+          <span class="badge-tag badge-blue">45.4% City Share</span>
+          <span>Max: 52,204 KW</span>
+        </div>
+      </div>
+
+      <!-- Zone 2 Power Card -->
+      <div class="kpi-card" style="--card-accent: #f59e0b;">
+        <div class="kpi-header">
+          <span class="kpi-title">ZONE 2 POWER CONSUMPTION</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="width:18px;height:18px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          </div>
+        </div>
+        <div class="kpi-value-wrap">
+          <span class="kpi-value" id="kpi-zone2-val">21,043</span>
+          <span class="kpi-unit">KW</span>
+        </div>
+        <div class="kpi-subtext">
+          <span class="badge-tag badge-amber">29.5% City Share</span>
+          <span>Max: 37,409 KW</span>
+        </div>
+      </div>
+
+      <!-- Zone 3 Power Card -->
+      <div class="kpi-card" style="--card-accent: #8b5cf6;">
+        <div class="kpi-header">
+          <span class="kpi-title">ZONE 3 POWER CONSUMPTION</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" style="width:18px;height:18px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+          </div>
+        </div>
+        <div class="kpi-value-wrap">
+          <span class="kpi-value" id="kpi-zone3-val">17,835</span>
+          <span class="kpi-unit">KW</span>
+        </div>
+        <div class="kpi-subtext">
+          <span class="badge-tag badge-purple">25.1% City Share</span>
+          <span>Max: 47,598 KW</span>
+        </div>
+      </div>
+
+      <!-- Weather Stations Card -->
+      <div class="kpi-card" style="--card-accent: #10b981;">
+        <div class="kpi-header">
+          <span class="kpi-title">WEATHER & GRID DRIVERS</span>
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="width:18px;height:18px;"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+          </div>
+        </div>
+        <div class="kpi-value-wrap" style="gap: 1.25rem;">
+          <div><span style="font-size:0.75rem;color:var(--text-muted);">Temp:</span> <strong id="kpi-temp-val" style="font-family:var(--font-mono);color:#fff;">18.8°C</strong></div>
+          <div><span style="font-size:0.75rem;color:var(--text-muted);">Hum:</span> <strong id="kpi-hum-val" style="font-family:var(--font-mono);color:#fff;">68%</strong></div>
+        </div>
+        <div class="kpi-subtext" style="gap: 0.8rem;">
+          <span>Wind: <strong id="kpi-wind-val" style="font-family:var(--font-mono);color:#cbd5e1;">1.96 m/s</strong></span>
+          <span>Solar: <strong id="kpi-solar-val" style="font-family:var(--font-mono);color:#cbd5e1;">258 W/m²</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: POWER CONSUMPTION MONITOR -->
+    <div id="tab-monitor" class="tab-content active">
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Actual Power Consumption vs Deep Learning Forecast (KW)</h2>
+            <span>Continuous 10-Minute Telemetry Curves (Total Grid Demand, Zone 1, Zone 2, Zone 3 & AI Projections)</span>
+          </div>
+          <div class="action-buttons">
+            <button id="toggle-stream-btn" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Live Telemetry Stream
+            </button>
+            <button id="step-stream-btn" class="btn-secondary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+              Next Step
+            </button>
+          </div>
+        </div>
+
+        <!-- Channel Toggles -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-card);">
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;cursor:pointer;">
+            <input type="checkbox" id="toggle-ch-total" checked>
+            <span style="color:#10b981;font-weight:600;">Total City Power (KW)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;cursor:pointer;">
+            <input type="checkbox" id="toggle-ch-pred" checked>
+            <span style="color:#06b6d4;font-weight:600;">AI Predicted Total (KW)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;cursor:pointer;">
+            <input type="checkbox" id="toggle-ch-z1" checked>
+            <span style="color:#3b82f6;font-weight:600;">Zone 1 Power (KW)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;cursor:pointer;">
+            <input type="checkbox" id="toggle-ch-z2" checked>
+            <span style="color:#f59e0b;font-weight:600;">Zone 2 Power (KW)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;cursor:pointer;">
+            <input type="checkbox" id="toggle-ch-z3" checked>
+            <span style="color:#8b5cf6;font-weight:600;">Zone 3 Power (KW)</span>
+          </label>
+        </div>
+
+        <div class="chart-container" style="height: 420px;">
+          <canvas id="chart-live-stream"></canvas>
+        </div>
+      </div>
+
+      <!-- Zone Power Consumption Breakdown & Model Specs -->
+      <div class="chart-grid-2">
+        <div class="card-section">
+          <div class="section-title" style="margin-bottom: 1rem;">
+            <h2>Zone Power Feeder Status & Consumption Capacity</h2>
+          </div>
+          <div class="zone-box" style="margin-bottom: 1rem;">
+            <div class="zone-box-header">
+              <span class="zone-name" style="color:#60a5fa;">Zone 1: Centre-Ville / Commercial District</span>
+              <span class="badge-tag badge-blue" id="zone1-pct-tag">62% Capacity</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div id="zone1-progress" class="progress-bar-fill" style="width: 62%;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono);">
+              <span>Current: <strong id="zone1-cur-kw" style="color:#fff;">32,345 KW</strong></span>
+              <span>Average: 32,345 KW</span>
+              <span>Peak Rating: 52,204 KW</span>
+            </div>
+          </div>
+
+          <div class="zone-box" style="margin-bottom: 1rem;">
+            <div class="zone-box-header">
+              <span class="zone-name" style="color:#fbbf24;">Zone 2: Industrial Corridor</span>
+              <span class="badge-tag badge-amber" id="zone2-pct-tag">56% Capacity</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div id="zone2-progress" class="progress-bar-fill" style="width: 56%; background:linear-gradient(90deg, #f59e0b, #d97706);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono);">
+              <span>Current: <strong id="zone2-cur-kw" style="color:#fff;">21,043 KW</strong></span>
+              <span>Average: 21,043 KW</span>
+              <span>Peak Rating: 37,409 KW</span>
+            </div>
+          </div>
+
+          <div class="zone-box">
+            <div class="zone-box-header">
+              <span class="zone-name" style="color:#c084fc;">Zone 3: Residential Suburbs & Coast</span>
+              <span class="badge-tag badge-purple" id="zone3-pct-tag">38% Capacity</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div id="zone3-progress" class="progress-bar-fill" style="width: 38%; background:linear-gradient(90deg, #8b5cf6, #7c3aed);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono);">
+              <span>Current: <strong id="zone3-cur-kw" style="color:#fff;">17,835 KW</strong></span>
+              <span>Average: 17,835 KW</span>
+              <span>Peak Rating: 47,598 KW</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-title" style="margin-bottom: 1rem;">
+            <h2>Deep Learning Power Model Telemetry</h2>
+          </div>
+          <table class="cyber-table">
+            <tbody>
+              <tr><td>Active Architecture</td><td><strong id="active-model-badge" style="color:var(--cyan);">Residual-MLP</strong></td></tr>
+              <tr><td>Total Power R² Score</td><td><strong id="current-model-r2" style="color:#34d399;">0.9964 (99.64%)</strong></td></tr>
+              <tr><td>Total Power RMSE</td><td><strong id="current-model-rmse">853.1 KW</strong></td></tr>
+              <tr><td>Mean Absolute Error (MAE)</td><td><strong id="current-model-mae" style="color:#34d399;">640.9 KW (1.06% MAPE)</strong></td></tr>
+              <tr><td>Inference Latency</td><td><strong id="current-model-latency" style="color:#38bdf8;">0.004 ms</strong></td></tr>
+              <tr><td>Temporal Window</td><td><strong>12 steps (2 hours lookback)</strong></td></tr>
+              <tr><td>Input Features</td><td><strong>17 Meteorological & Temporal Dimensions</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DEEP LEARNING POWER PREDICTOR (CALCULATOR) -->
+    <div id="tab-calculator" class="tab-content">
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Deep Learning Power Consumption Estimator</h2>
+            <span>Instantly Calculate Power Consumption for Zones 1, 2, 3 and Total City Demand</span>
+          </div>
+          <button id="calc-predict-btn" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Compute Prediction
+          </button>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Ambient Temperature (°C)</span>
+              <span id="calc-temp-val" class="slider-val">22.0°C</span>
+            </div>
+            <input type="range" id="calc-temp" min="3" max="42" step="0.5" value="22">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Historical range in Tetouan: 3.25°C to 40.01°C</span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Relative Humidity (%)</span>
+              <span id="calc-hum-val" class="slider-val">65%</span>
+            </div>
+            <input type="range" id="calc-hum" min="10" max="95" step="1" value="65">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Historical range: 11.3% to 94.8%</span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Wind Speed (m/s)</span>
+              <span id="calc-wind-val" class="slider-val">2.0 m/s</span>
+            </div>
+            <input type="range" id="calc-wind" min="0" max="7" step="0.1" value="2">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Historical range: 0.05 to 6.48 m/s</span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Solar Radiation Flux (W/m²)</span>
+              <span id="calc-solar-val" class="slider-val">250 W/m²</span>
+            </div>
+            <input type="range" id="calc-solar" min="0" max="1100" step="10" value="250">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Combined diffuse and direct flux</span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Hour of the Day</span>
+              <span id="calc-hour-val" class="slider-val">14:00 (Afternoon Peak)</span>
+            </div>
+            <input type="range" id="calc-hour" min="0" max="23" step="1" value="14">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Diurnal cycle: 00:00 to 23:00</span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Month of the Year</span>
+              <span id="calc-month-val" class="slider-val">July (Summer Surge)</span>
+            </div>
+            <input type="range" id="calc-month" min="1" max="12" step="1" value="7">
+            <span style="font-size:0.72rem;color:var(--text-muted);">Seasonal effect (1=Jan, 7=Jul, 12=Dec)</span>
+          </div>
+        </div>
+
+        <!-- Predicted Power Results Card -->
+        <div style="background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.25); border-radius: 14px; padding: 1.75rem; margin-top: 1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.25rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <span style="font-size:0.8rem; text-transform:uppercase; color:var(--cyan); font-weight:700;">PREDICTED TOTAL CITY POWER CONSUMPTION</span>
+              <div style="display:flex; align-items:baseline; gap:0.75rem; margin-top:0.25rem;">
+                <span id="calc-res-total-kw" style="font-size:2.4rem; font-weight:800; font-family:var(--font-mono); color:#fff;">72,450 KW</span>
+                <span id="calc-res-total-mw" style="font-size:1.1rem; font-weight:700; color:var(--text-secondary);">(72.45 MW)</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="badge-tag badge-green" id="calc-res-risk" style="font-size:0.85rem; padding:0.4rem 0.8rem;">GRID STATUS: NOMINAL</span>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem;">Model: <strong id="calc-res-model" style="color:var(--cyan);">Residual-MLP</strong> &bull; Latency: <strong id="calc-res-latency">0.004 ms</strong></div>
+            </div>
+          </div>
+
+          <!-- Zone breakdown bars -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid rgba(255,255,255,0.08);">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.35rem;">
+                <span style="color:#60a5fa;font-weight:700;">Zone 1 Power Consumption</span>
+                <strong id="calc-res-z1-kw" style="font-family:var(--font-mono);color:#fff;">33,100 KW</strong>
+              </div>
+              <div class="progress-bar-wrap"><div id="calc-bar-z1" class="progress-bar-fill" style="width:45%; background:#3b82f6;"></div></div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Downtown Commercial District</span>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.35rem;">
+                <span style="color:#fbbf24;font-weight:700;">Zone 2 Power Consumption</span>
+                <strong id="calc-res-z2-kw" style="font-family:var(--font-mono);color:#fff;">21,250 KW</strong>
+              </div>
+              <div class="progress-bar-wrap"><div id="calc-bar-z2" class="progress-bar-fill" style="width:29%; background:#f59e0b;"></div></div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Industrial / Manufacturing Corridor</span>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.35rem;">
+                <span style="color:#c084fc;font-weight:700;">Zone 3 Power Consumption</span>
+                <strong id="calc-res-z3-kw" style="font-family:var(--font-mono);color:#fff;">18,100 KW</strong>
+              </div>
+              <div class="progress-bar-wrap"><div id="calc-bar-z3" class="progress-bar-fill" style="width:25%; background:#8b5cf6;"></div></div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Residential & Coastal Tourism Suburbs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: DATASET RECORDS (RAW DATA VIEWER) -->
+    <div id="tab-dataset" class="tab-content">
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Tetouan City Power Consumption Dataset (52,416 Records)</h2>
+            <span>View Actual Sensor Telemetry Recorded at 10-Minute Intervals</span>
+          </div>
+          <div class="action-buttons">
+            <button id="dataset-prev-btn" class="btn-secondary">&larr; Previous</button>
+            <span id="dataset-page-info" style="font-family:var(--font-mono);font-size:0.82rem;color:var(--text-secondary);">Rows 1-50 of 52,416</span>
+            <button id="dataset-next-btn" class="btn-secondary">Next &rarr;</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>DateTime</th>
+                <th>Temp (°C)</th>
+                <th>Humidity (%)</th>
+                <th>Wind (m/s)</th>
+                <th>Solar Flux</th>
+                <th style="color:#60a5fa;">Zone 1 Power (KW)</th>
+                <th style="color:#fbbf24;">Zone 2 Power (KW)</th>
+                <th style="color:#c084fc;">Zone 3 Power (KW)</th>
+                <th style="color:#34d399;">Total Power (KW)</th>
+              </tr>
+            </thead>
+            <tbody id="dataset-table-body">
+              <tr><td colspan="9" style="text-align:center;padding:2rem;">Loading power consumption records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: MULTI-HORIZON FORECAST -->
+    <div id="tab-forecast" class="tab-content">
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Multi-Horizon Power Consumption Projections</h2>
+            <span>Forward Multi-Step Lookahead (1 to 48 Hours Ahead) with 95% Bayesian/Empirical Bounds</span>
+          </div>
+          <div class="action-buttons">
+            <label style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">HORIZON:</label>
+            <select id="forecast-horizon" class="model-select" style="background:var(--bg-secondary);padding:0.4rem 0.8rem;border:1px solid var(--border-card);border-radius:6px;">
+              <option value="6">6 Hours Ahead (36 Steps)</option>
+              <option value="12">12 Hours Ahead (72 Steps)</option>
+              <option value="24" selected>24 Hours Ahead (144 Steps)</option>
+              <option value="48">48 Hours Ahead (288 Steps)</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-container" style="height: 420px;">
+          <canvas id="chart-forecast-horizon"></canvas>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <div class="section-title" style="margin-bottom: 1.25rem;">
+          <h2>Zone Power Consumption Stacked Distribution</h2>
+          <span>Zone 1, Zone 2, and Zone 3 Contributions Across Forecast Horizon</span>
+        </div>
+        <div class="chart-container" style="height: 340px;">
+          <canvas id="chart-zone-stacked"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: MODEL BENCHMARK HUB -->
+    <div id="tab-benchmarks" class="tab-content">
+      <div class="card-section">
+        <div class="section-title" style="margin-bottom: 1.25rem;">
+          <h2>Deep Learning Model Benchmark Hub</h2>
+          <span>Rigorous Evaluation on 15% Chronological Holdout Test Horizon (7,851 Samples)</span>
+        </div>
+        <div class="table-responsive">
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Parameters</th>
+                <th>Total Power R²</th>
+                <th>Total RMSE (KW)</th>
+                <th>Total MAE (KW)</th>
+                <th>Total MAPE (%)</th>
+                <th>Zone RMSE (Z1/Z2/Z3)</th>
+                <th>Latency (ms)</th>
+                <th>Train Time</th>
+              </tr>
+            </thead>
+            <tbody id="benchmark-table-body">
+              <tr><td colspan="9" style="text-align:center;padding:2rem;">Loading model benchmark evaluation matrix...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="card-section">
+          <div class="section-title" style="margin-bottom: 1rem;">
+            <h2>Accuracy (R²) vs Power Error (RMSE)</h2>
+          </div>
+          <div class="chart-container" style="height: 320px;">
+            <canvas id="chart-benchmark-bars"></canvas>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-title" style="margin-bottom: 1rem;">
+            <h2>Multi-Criteria Operational Radar</h2>
+          </div>
+          <div class="chart-container" style="height: 320px;">
+            <canvas id="chart-benchmark-radar"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: ZONE TOPOLOGY & ANALYTICS -->
+    <div id="tab-topology" class="tab-content">
+      <div class="card-section">
+        <div class="section-title" style="margin-bottom: 1.25rem;">
+          <h2>Tetouan Diurnal Power Consumption (24-Hour Cycle)</h2>
+          <span>Average Hourly Power Demand across Commercial, Industrial, and Residential Zones</span>
+        </div>
+        <div class="chart-container" style="height: 360px;">
+          <canvas id="chart-hourly-diurnal"></canvas>
+        </div>
+      </div>
+
+      <div class="zone-grid">
+        <div class="zone-box">
+          <div class="zone-box-header">
+            <span class="zone-name">Zone 1: Centre-Ville Commercial</span>
+            <span class="badge-tag badge-blue">45.4% Share</span>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:1rem;">
+            Downtown offices, banks, municipal services, and markets. Strong daytime ramp between 08:00 and 19:00 with intense afternoon cooling loads.
+          </p>
+          <div style="font-family:var(--font-mono);font-size:0.8rem;display:flex;flex-direction:column;gap:0.35rem;">
+            <div>Mean Consumption: <strong>32,345 KW</strong></div>
+            <div>Peak Consumption: <strong>52,204 KW</strong></div>
+            <div>Temp Sensitivity: <strong>r = +0.4402</strong></div>
+          </div>
+        </div>
+
+        <div class="zone-box">
+          <div class="zone-box-header">
+            <span class="zone-name">Zone 2: Industrial Corridor</span>
+            <span class="badge-tag badge-amber">29.5% Share</span>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:1rem;">
+            Manufacturing facilities, textile units, and cold storage warehouses. Steady baseload demand on weekdays, reducing significantly on weekend afternoons.
+          </p>
+          <div style="font-family:var(--font-mono);font-size:0.8rem;display:flex;flex-direction:column;gap:0.35rem;">
+            <div>Mean Consumption: <strong>21,043 KW</strong></div>
+            <div>Peak Consumption: <strong>37,409 KW</strong></div>
+            <div>Temp Sensitivity: <strong>r = +0.3824</strong></div>
+          </div>
+        </div>
+
+        <div class="zone-box">
+          <div class="zone-box-header">
+            <span class="zone-name">Zone 3: Residential Suburbs & Coast</span>
+            <span class="badge-tag badge-purple">25.1% Share</span>
+          </div>
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:1rem;">
+            Domestic households and Mediterranean coastal resorts. Notable dual diurnal peaks (07:00-09:00 and 20:00-23:00) with summer tourism spikes.
+          </p>
+          <div style="font-family:var(--font-mono);font-size:0.8rem;display:flex;flex-direction:column;gap:0.35rem;">
+            <div>Mean Consumption: <strong>17,835 KW</strong></div>
+            <div>Peak Consumption: <strong>47,598 KW</strong></div>
+            <div>Temp Sensitivity: <strong>r = +0.4895</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: PRODUCTION TECHNICAL REPORT -->
+    <div id="tab-report" class="tab-content">
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h2>Comprehensive Production Technical Report</h2>
+            <span>Industrial & Academic Specification on Deep Learning Power Consumption Forecasting</span>
+          </div>
+          <div class="action-buttons">
+            <button onclick="window.print()" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              Print / Save PDF
+            </button>
+          </div>
+        </div>
+
+        <article class="report-viewer">
+          <h1>EXECUTIVE SUMMARY & SYSTEM SPECIFICATION</h1>
+          <p>
+            This technical document provides the complete architectural, algorithmic, and operational specification for the <strong>Tetouan Smart Grid Deep Learning Power Consumption System</strong>. The objective of this project is to develop and deploy high-performance Deep Learning forecasting models to predict multi-zone electricity consumption across the city of Tetouan, Morocco, with micro-interval precision (10 minutes) and multi-hour lookahead horizons.
+          </p>
+
+          <h2>1. DATASET CHARACTERISTICS & SENSOR TOPOLOGY</h2>
+          <p>
+            The dataset captures complete 2017 power consumption telemetry from the Moroccan electric utility in Tetouan. The telemetry stream consists of <strong>52,416 observations</strong> recorded at regular 10-minute intervals across 364 days.
+          </p>
+          <ul>
+            <li><strong>Zone 1 (Downtown / Commercial Center):</strong> Average demand of 32,345 KW (Peak: 52,204 KW, 45.4% grid volume). Characterized by high diurnal variance with strong daylight administrative and business loading.</li>
+            <li><strong>Zone 2 (Industrial & Manufacturing Corridor):</strong> Average demand of 21,043 KW (Peak: 37,409 KW, 29.5% grid volume). Demonstrates steady baseload demand driven by manufacturing operations and shift schedules.</li>
+            <li><strong>Zone 3 (Residential & Coastal Tourism Belt):</strong> Average demand of 17,835 KW (Peak: 47,598 KW, 25.1% grid volume). Exhibits dual morning and evening domestic peaks and extreme summer seasonal sensitivity due to air conditioning.</li>
+            <li><strong>Meteorological Drivers:</strong> Continuous sensor feeds of Ambient Temperature (3.25°C to 40.01°C), Relative Humidity (11.3% to 94.8%), Wind Speed (0.05 to 6.48 m/s), and Solar Diffuse Flux (0 to 1,163 W/m²).</li>
+          </ul>
+
+          <h2>2. FEATURE ENGINEERING & TEMPORAL WINDOWING</h2>
+          <p>
+            To prevent lookahead data leakage, a strict chronological train/validation/test split of <strong>70% / 15% / 15%</strong> was applied. Feature engineering encompasses:
+          </p>
+          <ul>
+            <li><strong>Cyclical Trigonometric Encodings:</strong> Sine and cosine transformations of Hour of Day, Month of Year, and Day of Week to preserve continuous temporal continuity.</li>
+            <li><strong>Thermodynamic Interaction Proxies:</strong> Heat Index Proxy (<code>Temperature × Humidity / 100</code>) capturing human thermal discomfort and corresponding air conditioning loads.</li>
+            <li><strong>Solar Irradiance Flux:</strong> Aggregate diffuse flux combining general diffuse flows and horizontal diffuse flows.</li>
+            <li><strong>Sliding Input Tensor:</strong> Input temporal window $W = 12$ time-steps (representing the past 2 hours of telemetry) formatted into tensor shape $[B, 12, 17]$.</li>
+          </ul>
+
+          <h2>3. DEEP LEARNING ARCHITECTURES EVALUATED</h2>
+          <p>Five distinct neural architectures were designed, trained, and benchmarked:</p>
+          <ul>
+            <li><strong>1. Residual Deep MLP (ResNet-MLP):</strong> Top performing architecture ($R^2 = 0.9964$, MAPE $1.06\%$, MAE $640.9$ KW, Latency $0.004$ ms). Dual residual skip connections with Layer Normalization and GELU.</li>
+            <li><strong>2. Long Short-Term Memory (LSTM):</strong> 2-layer stacked LSTM network ($R^2 = 0.9873$, MAPE $2.05\%$).</li>
+            <li><strong>3. Gated Recurrent Unit (GRU):</strong> 2-layer GRU with reset and update gates ($R^2 = 0.9836$, MAPE $2.68\%$).</li>
+            <li><strong>4. Temporal Transformer:</strong> Positional encoding layer coupled with a 4-head Multi-Head Self-Attention Transformer Encoder ($R^2 = 0.9824$, MAPE $2.48\%$).</li>
+            <li><strong>5. 1D-CNN + BiLSTM (Hybrid):</strong> 1D Convolutional filter banks with Batch Normalization piped into Bidirectional LSTM ($R^2 = 0.9751$, MAPE $3.34\%$).</li>
+          </ul>
+
+          <h2>4. VERIFICATION & OPERATIONAL RECOMMENDATIONS</h2>
+          <p>
+            For production deployment in electric utility dispatch centers:
+          </p>
+          <ul>
+            <li><strong>Model Selection Recommendation:</strong> The <strong>Residual-MLP</strong> model provides the highest accuracy and lowest compute footprint for real-time SCADA integration.</li>
+            <li><strong>Automated Anomaly Protocols:</strong> When forecast variance exceeds 10% MAPE or total load surges beyond 90,000 KW, automated alerts trigger demand-response protocols and spinning reserve ramp-up.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>TETOUAN SMART GRID DEEP LEARNING SYSTEM &bull; PRODUCTION READY &bull; POWER CONSUMPTION AI</p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
