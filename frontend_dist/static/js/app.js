@@ -423,7 +423,32 @@ async function loadInitialPowerTrajectory() {
   }
 }
 
-function updateKpiNumbers(total, z1, z2, z3, temp, hum, wind, solar) {
+function updateGridAlertStatus(totalKw, streamAlert) {
+  const el = document.getElementById("grid-alert-status");
+  if (!el) return;
+
+  let label = "NORMAL LOAD";
+  let cls = "badge-tag badge-green";
+
+  if (streamAlert && String(streamAlert).includes("ANOMALY")) {
+    label = "FORECAST ANOMALY";
+    cls = "badge-tag badge-rose";
+  } else if (totalKw > 95000) {
+    label = "CRITICAL PEAK";
+    cls = "badge-tag badge-rose";
+  } else if (totalKw > 80000) {
+    label = "HIGH LOAD";
+    cls = "badge-tag badge-amber";
+  } else if (totalKw < 45000) {
+    label = "OFF-PEAK";
+    cls = "badge-tag badge-blue";
+  }
+
+  el.innerText = label;
+  el.className = cls;
+}
+
+function updateKpiNumbers(total, z1, z2, z3, temp, hum, wind, solar, streamAlert) {
   const totEl = document.getElementById("kpi-total-val");
   const z1El = document.getElementById("kpi-zone1-val");
   const z2El = document.getElementById("kpi-zone2-val");
@@ -466,6 +491,8 @@ function updateKpiNumbers(total, z1, z2, z3, temp, hum, wind, solar) {
   if (t1) t1.innerText = `${pct1}% Capacity`;
   if (t2) t2.innerText = `${pct2}% Capacity`;
   if (t3) t3.innerText = `${pct3}% Capacity`;
+
+  updateGridAlertStatus(total, streamAlert);
 }
 
 // Live Telemetry Streaming
@@ -493,7 +520,7 @@ async function fetchStreamStep() {
     if (!res.ok) return;
     const packet = await res.json();
     
-    updateKpiNumbers(packet.actual.total, packet.actual.zone_1, packet.actual.zone_2, packet.actual.zone_3, packet.weather.temperature, packet.weather.humidity, packet.weather.wind_speed, packet.weather.solar_radiation);
+    updateKpiNumbers(packet.actual.total, packet.actual.zone_1, packet.actual.zone_2, packet.actual.zone_3, packet.weather.temperature, packet.weather.humidity, packet.weather.wind_speed, packet.weather.solar_radiation, packet.alert);
     
     const chart = state.charts.liveStream;
     if (chart) {
